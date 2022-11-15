@@ -55,57 +55,6 @@ export const constantRoutes = [
     }]
   },
 
-  {
-    path: '/system',
-    component: Layout,
-    redirect: '/system/tenant',
-    name: 'System',
-    meta: { title: '系统管理', icon: 'el-icon-setting', affix: true },
-    children: [
-      {
-        path: 'tenant',
-        name: 'Tenant',
-        component: () => import('@/views/table/index'),
-        meta: { title: '租户管理', icon: 'nested'}
-      },
-      {
-        path: 'user',
-        name: 'User',
-        component: () => import('@/views/tree/index'),
-        meta: { title: '用户管理', icon: 'el-icon-user' }
-      },
-      {
-        path: 'role',
-        name: 'Role',
-        component: () => import('@/views/tree/index'),
-        meta: { title: '角色管理'}
-      },
-      {
-        path: 'menu',
-        name: 'Menu',
-        component: () => import('@/views/tree/index'),
-        meta: { title: '菜单管理', icon: 'el-icon-menu' }
-      },
-      {
-        path: 'org',
-        name: 'Org',
-        component: () => import('@/views/tree/index'),
-        meta: { title: '机构管理'}
-      },
-      {
-        path: 'job',
-        name: 'Job',
-        component: () => import('@/views/tree/index'),
-        meta: { title: '岗位管理'}
-      },
-      {
-        path: 'dic',
-        name: 'Dic',
-        component: () => import('@/views/dic/index'),
-        meta: { title: '字典管理'}
-      }
-    ]
-  },
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
