@@ -102,8 +102,7 @@ export const constantRoutes = [
           activeMenu: '/example/example-page'
         },
         hidden: true
-      }
-      ,
+      },
       {
         path: 'example-detail',
         component: () => import('@/views/Example/Page/ExampleDetail.vue'),
