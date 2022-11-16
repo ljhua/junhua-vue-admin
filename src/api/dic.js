@@ -7,3 +7,11 @@ export function getPage(params) {
     params
   })
 }
+
+export function getChildrenList(params) {
+  return request({
+    url: '/sysDic/getChildrenList',
+    method: 'get',
+    params
+  })
+}

@@ -75,6 +75,14 @@ export const constantRoutes = [
         }
       },
       {
+        path: 'example-tree',
+        component: () => import('@/views/Example/Tree/ExampleTreeNew.vue'),
+        name: 'ExampleTree',
+        meta: {
+          title: '树型'
+        }
+      },
+      {
         path: 'example-page',
         component: () => import('@/views/Example/Page/ExamplePage.vue'),
         name: 'ExamplePage',

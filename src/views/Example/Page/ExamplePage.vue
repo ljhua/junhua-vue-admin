@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.title" :placeholder="'标题'" style="width: 200px;" class="filter-item" @keyup.enter.native="" />
-      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="">
+      <el-input v-model="listQuery.title" :placeholder="'标题'" style="width: 200px;" class="filter-item" />
+      <el-button class="filter-item" type="primary" icon="el-icon-search">
         {{ '搜索' }}
       </el-button>
       <router-link :to="'/example/example-add/'">
