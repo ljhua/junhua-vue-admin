@@ -8,9 +8,9 @@ export function getPage(params) {
   })
 }
 
-export function getChildrenList(params) {
+export function getDicByPid(params) {
   return request({
-    url: '/sysDic/getChildrenList',
+    url: '/sysDic/getDicByPid',
     method: 'get',
     params
   })

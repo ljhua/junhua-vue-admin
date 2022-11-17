@@ -1,5 +1,18 @@
 <template>
-  <div>
+  <div class="app-container">
+    <div class="filter-container">
+      <el-input v-model="listQuery.dicName" placeholder="名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+        搜索
+      </el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+        添加
+      </el-button>
+      <el-button class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
+        导出
+      </el-button>
+    </div>
+    
     <el-table
       :data="list"
       style="width: 100%"
@@ -9,14 +22,48 @@
       :load="load"
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
     >
-      <el-table-column prop="dicName" label="字典名称" />
-      <el-table-column prop="dicCode" label="字典编码" />
+      <el-table-column label="名称" >
+        <template slot-scope="{row}">
+          <span>{{ row.dicName }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="编码" >
+        <template slot-scope="{row}">
+          <span>{{ row.dicCode }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="排序" >
+        <template slot-scope="{row}">
+          <span>{{ row.dicOrder }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="状态" >
+        <template slot-scope="{row}">
+          <span>{{ row.dicStatus }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="备注" >
+        <template slot-scope="{row}">
+          <span>{{ row.comments }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="280">
+        <template slot-scope="{row, $index}">
+          <el-button v-if="row.parentId==0" size="mini" type="primary" @click="handleCreate">新增</el-button>
+          <el-button size="mini" type="primary" @click="handleUpdate(row)">编辑</el-button>
+          <el-button size="mini" type="danger" @click="handleDelete(row,$index)">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <pagination
       v-show="total > 0"
       :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
+      :page.sync="listQuery.current"
+      :limit.sync="listQuery.size"
       @pagination="getList"
     />
   </div>
@@ -24,7 +71,7 @@
 
 <script>
 import { getPage } from "@/api/dic";
-import { getChildrenList } from "@/api/dic";
+import { getDicByPid } from "@/api/dic";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 
 export default {
@@ -34,32 +81,58 @@ export default {
       list: [],
       total: 0,
       listQuery: {
-        page: 1,
-        limit: 20,
-      },
-    };
+        current: 1,
+        size: 10,
+        parentId: 0
+      }
+    }
   },
 
   created() {
-    this.getList();
+    this.getList()
   },
 
   methods: {
     getList() {
       getPage(this.listQuery).then((response) => {
-        this.list = response.data.list;
-        this.total = response.data.totalRows;
-      });
+        this.list = response.data.list
+        this.total = response.data.totalRows
+      })
     },
     async load(tree, treeNode, resolve) {
-      let params = {
-        dicId: tree.id,
-      };
-      let resp = await getChildrenList(params);
-      console.log(resp);
-      console.log(resp.data);
-      resolve(resp.data);
+      const params = {
+        pid: tree.id
+      }
+      const resp = await getDicByPid(params)
+      resolve(resp.data)
     },
-  },
+    handleDelete(row, index) {
+      this.$notify({
+        title: '成功',
+        message: '删除onclick成功',
+        type: 'success',
+        duration: 2000
+      })
+    },
+    handleCreate() {
+      this.$notify({
+        title: '成功',
+        message: '添加onclick成功',
+        type: 'success',
+        duration: 2000
+      })
+    },
+    handleUpdate(row) {
+      this.$notify({
+        title: '成功',
+        message: '编辑onclick成功',
+        type: 'success',
+        duration: 2000
+      })
+    },
+
+    handleFilter() {},
+    handleDownload() {},
+  }
 };
 </script>
