@@ -7,45 +7,51 @@
         搜索
       </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"
-        @click="handleCreate(null)">
+        @click="handleCreate">
         添加
+      </el-button>
+      <el-button class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
+        导出
       </el-button>
     </div>
 
-    <el-table :data="list" style="width: 100%" row-key="id" border lazy :load="load"
-      :tree-props="{ children: 'children', hasChildren: 'hasChildren' }">
-      <el-table-column label="名称">
+    <el-table :data="list" style="width: 100%" row-key="id" border>
+      <el-table-column label="套餐名称" width="250">
         <template slot-scope="{row}">
-          <span>{{ row.dicName }}</span>
+          <span>{{ row.name }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="套餐状态">
+        <template slot-scope="{row}">
+          <span>{{ row.status }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="编码">
+      <el-table-column label="创建人">
         <template slot-scope="{row}">
-          <span>{{ row.dicCode }}</span>
+          <span>{{ row.createdByName }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="排序">
+      <el-table-column label="创建时间">
         <template slot-scope="{row}">
-          <span>{{ row.sort }}</span>
+          <span>{{ row.createdTime }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="状态">
+      <el-table-column label="最后更新人">
         <template slot-scope="{row}">
-          <span>{{ row.dicStatus }}</span>
+          <span>{{ row.modifiedByName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="最后更新时间">
+        <template slot-scope="{row}">
+          <span>{{ row.modifiedTime }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="备注">
-        <template slot-scope="{row}">
-          <span>{{ row.comments }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="280">
+      <el-table-column label="操作" width="160">
         <template slot-scope="{row, $index}">
-          <el-button v-if="row.parentId==0" size="mini" type="primary" @click="handleCreate(row)">新增</el-button>
           <el-button size="mini" type="primary" @click="handleUpdate(row)">编辑</el-button>
           <el-button size="mini" type="danger" @click="handleDelete(row,$index)">删除</el-button>
         </template>
@@ -55,39 +61,25 @@
       @pagination="getList" />
 
     <el-dialog :title="text[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :model="temp">
-        <el-form-item label="名称">
-          <el-input v-model="temp.dicName" />
+      <el-form ref="dataForm" :model="tmp">
+        <el-form-item label="套餐名称">
+          <el-input v-model="tmp.name" />
         </el-form-item>
-        <el-form-item label="编码">
-          <el-input v-model="temp.dicCode" />
-        </el-form-item>
-        <el-form-item label="排序">
-          <el-input v-model="temp.sort" />
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-tooltip :content="'Switch value: ' + temp.dicStatus" placement="top">
-            <el-switch v-model="temp.dicStatus" active-color="#13ce66" inactive-color="#ff4949" active-value="1"
-              inactive-value="0">
-            </el-switch>
-          </el-tooltip>
-        </el-form-item>
-        <el-form-item label="备注">
-          <el-input v-model="temp.comments" />
+        <el-form-item label="套餐状态">
+          <el-input v-model="tmp.status" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createChildrenData():updateData()">确认</el-button>
+        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">确认</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getPage } from "@/api/dic";
-import { getByPid } from "@/api/dic";
-import { create, update } from "@/api/dic";
+import { getPage } from "@/api/package";
+import { create, update } from "@/api/package";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 
 export default {
@@ -101,20 +93,16 @@ export default {
         size: 10,
         parentId: 0
       },
-      temp: {
+      tmp: {
         id: undefined,
-        dicName: '',
-        dicCode: '',
-        parentId: 0,
-        sort: 0,
-        dicStatus: 0,
-        comments: ''
+        name: '',
+        status: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
       text: {
         update: '编辑',
-        create: '新建'
+        create: '创建'
       },
       dialogPvVisible: false,
       pvData: []
@@ -132,13 +120,6 @@ export default {
         this.total = response.data.totalRows
       })
     },
-    async load (tree, treeNode, resolve) {
-      const params = {
-        pid: tree.id
-      }
-      const resp = await getByPid(params)
-      resolve(resp.data)
-    },
     handleDelete (row, index) {
       this.$notify({
         title: '成功',
@@ -148,12 +129,8 @@ export default {
       })
     },
     handleCreate (row) {
-      if (row != null) {
-        this.temp = Object.assign({}, row) // copy obj
-        const pid = this.temp.id;
-        this.resetTemp()
-        this.temp.parentId = pid
-      }
+      this.tmp = Object.assign({}, row) // copy obj
+      this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -161,7 +138,7 @@ export default {
       })
     },
     handleUpdate (row) {
-      this.temp = Object.assign({}, row) // copy obj
+      this.tmp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -170,7 +147,7 @@ export default {
     },
 
     resetTemp () {
-      this.temp = {
+      this.tmp = {
         // id: undefined,
         dicName: ''
       }
@@ -178,14 +155,14 @@ export default {
 
     handleFilter () { },
     handleDownload () { },
-    // handleCreate () { },
+    handleTopCreate () { },
 
-    createChildrenData () {
+    createData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          console.log(this.temp)
-          create(this.temp).then(() => {
-            // this.list.unshift(this.temp)
+          console.log(this.tmp)
+          create(this.tmp).then(() => {
+            this.list.unshift(this.tmp)
             this.dialogFormVisible = false
             this.$notify({
               title: '成功',
@@ -201,11 +178,11 @@ export default {
     updateData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp)
+          const tempData = Object.assign({}, this.tmp)
           console.log(tempData)
           update(tempData).then(() => {
-            // const index = this.list.findIndex(v => v.id === this.temp.id)
-            // this.list.splice(index, 1, this.temp)
+            const index = this.list.findIndex(v => v.id === this.tmp.id)
+            this.list.splice(index, 1, this.tmp)
             this.dialogFormVisible = false
             this.$notify({
               title: '成功',

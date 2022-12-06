@@ -56,74 +56,47 @@ export const constantRoutes = [
   },
 
   {
-    path: '/example',
+    path: '/system',
     component: Layout,
-    redirect: '/example/example-dialog',
-    name: 'Example',
+    // redirect: '/example/example-dialog',
+    name: 'System',
     meta: {
-      title: '综合实例',
+      title: '系统管理',
       icon: 'ep:management',
       alwaysShow: true
     },
     children: [
       {
-        path: 'example-dialog',
-        component: () => import('@/views/Example/Dialog/ExampleDialog.vue'),
-        name: 'ExampleDialog',
+        path: 'resource',
+        component: () => import('@/views/resource/index.vue'),
+        name: 'Resource',
         meta: {
-          title: '弹窗型'
+          title: '资源管理'
         }
       },
       {
-        path: 'example-tree',
-        component: () => import('@/views/Example/Tree/ExampleTreeNew.vue'),
-        name: 'ExampleTree',
+        path: 'package',
+        component: () => import('@/views/package/index.vue'),
+        name: 'Package',
         meta: {
-          title: '树型'
+          title: '租户套餐管理'
         }
       },
       {
-        path: 'example-page',
-        component: () => import('@/views/Example/Page/ExamplePage.vue'),
-        name: 'ExamplePage',
+        path: 'org',
+        component: () => import('@/views/org/index.vue'),
+        name: 'Org',
         meta: {
-          title: '非弹窗型'
+          title: '组织管理'
         }
       },
       {
-        path: 'example-add',
-        component: () => import('@/views/Example/Page/ExampleAdd.vue'),
-        name: 'ExampleAdd',
+        path: 'dic',
+        component: () => import('@/views/dic/index.vue'),
+        name: 'Dic',
         meta: {
-          title: '添加页面'
-        },
-        hidden: true
-      },
-      {
-        path: 'example-edit/:id(\\d+)',
-        component: () => import('@/views/Example/Page/ExampleEdit.vue'),
-        name: 'ExampleEdit',
-        meta: {
-          title: '编辑页面',
-          noCache: true,
-          canTo: true,
-          activeMenu: '/example/example-page'
-        },
-        hidden: true
-      },
-      {
-        path: 'example-detail',
-        component: () => import('@/views/Example/Page/ExampleDetail.vue'),
-        name: 'ExampleDetail',
-        meta: {
-          title: '详情页面',
-          noTagsView: true,
-          noCache: true,
-          hidden: true,
-          canTo: true,
-          activeMenu: '/example/example-page'
-        },
-        hidden: true
+          title: '字典管理'
+        }
       }
     ]
   },
@@ -141,7 +114,7 @@ const createRouter = () => new Router({
 const router = createRouter()
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
-export function resetRouter() {
+export function resetRouter () {
   const newRouter = createRouter()
   router.matcher = newRouter.matcher // reset router
 }

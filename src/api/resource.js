@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function getPage (params) {
   return request({
-    url: '/sysDic/getPage',
+    url: '/sysResource/getPage',
     method: 'get',
     params
   })
@@ -10,7 +10,7 @@ export function getPage (params) {
 
 export function getByPid (params) {
   return request({
-    url: '/sysDic/getByPid',
+    url: '/sysResource/getByPid',
     method: 'get',
     params
   })
@@ -18,7 +18,7 @@ export function getByPid (params) {
 
 export function create (data) {
   return request({
-    url: '/sysDic/create',
+    url: '/sysResource/create',
     method: 'post',
     data
   })
@@ -26,16 +26,8 @@ export function create (data) {
 
 export function update (data) {
   return request({
-    url: '/sysDic/update',
+    url: '/sysResource/update',
     method: 'post',
     data
-  })
-}
-
-export function getChildrenByDicCode (params) {
-  return request({
-    url: '/sysDic/getChildrenByDicCode',
-    method: 'get',
-    params
   })
 }

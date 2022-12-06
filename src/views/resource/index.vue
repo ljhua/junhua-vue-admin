@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.dicName" placeholder="名称" style="width: 200px;" class="filter-item"
+      <el-input v-model="listQuery.orgName" placeholder="名称" style="width: 200px;" class="filter-item"
         @keyup.enter.native="handleFilter" />
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
@@ -14,39 +14,77 @@
 
     <el-table :data="list" style="width: 100%" row-key="id" border lazy :load="load"
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }">
-      <el-table-column label="名称">
+      <el-table-column label="资源名称" width="160">
         <template slot-scope="{row}">
-          <span>{{ row.dicName }}</span>
+          <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column label="编码">
+      <el-table-column label="资源标识">
         <template slot-scope="{row}">
-          <span>{{ row.dicCode }}</span>
+          <span>{{ row.permission }}</span>
         </template>
       </el-table-column>
-
+      <el-table-column label="资源类型">
+        <template slot-scope="{row}">
+          <span>{{ row.resourceTypeName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="资源图标">
+        <template slot-scope="{row}">
+          <span>{{ row.routerIcon }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="路由地址">
+        <template slot-scope="{row}">
+          <span>{{ row.routerPath }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="组件地址">
+        <template slot-scope="{row}">
+          <span>{{ row.routerComponent }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="URI">
+        <template slot-scope="{row}">
+          <span>{{ row.uri }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="排序">
         <template slot-scope="{row}">
           <span>{{ row.sort }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column label="状态">
+      <el-table-column label="是否显示">
         <template slot-scope="{row}">
-          <span>{{ row.dicStatus }}</span>
+          <span>{{ row.visible }}</span>
         </template>
       </el-table-column>
-
+      <el-table-column label="是否缓存">
+        <template slot-scope="{row}">
+          <span>{{ row.routerKeepAlive }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="资源页面名称">
+        <template slot-scope="{row}">
+          <span>{{ row.routerPageName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="状态">
+        <template slot-scope="{row}">
+          <span>{{ row.status }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="备注">
         <template slot-scope="{row}">
           <span>{{ row.comments }}</span>
         </template>
       </el-table-column>
+
       <el-table-column label="操作" width="280">
         <template slot-scope="{row, $index}">
-          <el-button v-if="row.parentId==0" size="mini" type="primary" @click="handleCreate(row)">新增</el-button>
+          <el-button size="mini" type="primary" @click="handleCreate(row)">新增</el-button>
           <el-button size="mini" type="primary" @click="handleUpdate(row)">编辑</el-button>
+          <el-button size="mini" type="primary">详情</el-button>
           <el-button size="mini" type="danger" @click="handleDelete(row,$index)">删除</el-button>
         </template>
       </el-table-column>
@@ -56,44 +94,74 @@
 
     <el-dialog :title="text[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :model="temp">
-        <el-form-item label="名称">
-          <el-input v-model="temp.dicName" />
+        <el-form-item label="资源名称">
+          <el-input v-model="temp.name" />
         </el-form-item>
-        <el-form-item label="编码">
-          <el-input v-model="temp.dicCode" />
+        <el-form-item label="资源标识">
+          <el-input v-model="temp.permission" />
         </el-form-item>
+
+        <el-form-item label="资源类型">
+          <el-select v-model="temp.resourceTypeName" @input="selectChangeParent" placeholder="请选择">
+            <el-option v-for="(item, index) in options" :key="index" :label="item.dicName" :value="index">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="资源图标">
+          <el-input v-model="temp.routerIcon" />
+        </el-form-item>
+
+        <el-form-item label="资源路径">
+          <el-input v-model="temp.routerPath" />
+        </el-form-item>
+
+        <el-form-item label="资源URL">
+          <el-input v-model="temp.uri" />
+        </el-form-item>
+
         <el-form-item label="排序">
-          <el-input v-model="temp.sort" />
+          <el-input v-model="temp.resourceLevel" />
+        </el-form-item>
+        <el-form-item label="是否展示">
+          <el-switch v-model="temp.routerVisible" active-color="#13ce66" inactive-color="#ff4949">
+          </el-switch>
+        </el-form-item>
+        <el-form-item label="是否缓存">
+          <el-switch v-model="temp.routerKeepAlive" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+        </el-form-item>
+        <el-form-item label="资源页面名称">
+          <el-input v-model="temp.routerPageName" />
         </el-form-item>
         <el-form-item label="状态">
-          <el-tooltip :content="'Switch value: ' + temp.dicStatus" placement="top">
-            <el-switch v-model="temp.dicStatus" active-color="#13ce66" inactive-color="#ff4949" active-value="1"
-              inactive-value="0">
-            </el-switch>
-          </el-tooltip>
+          <el-input v-model="temp.status" />
         </el-form-item>
+
         <el-form-item label="备注">
           <el-input v-model="temp.comments" />
         </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createChildrenData():updateData()">确认</el-button>
+        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">确认</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getPage } from "@/api/dic";
-import { getByPid } from "@/api/dic";
-import { create, update } from "@/api/dic";
+import { getPage } from "@/api/resource";
+import { getByPid } from "@/api/resource";
+import { create, update } from "@/api/resource";
+import { getChildrenByDicCode } from "@/api/dic"
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 
 export default {
   components: { Pagination },
   data () {
     return {
+      options: [],
       list: [],
       total: 0,
       listQuery: {
@@ -103,11 +171,20 @@ export default {
       },
       temp: {
         id: undefined,
-        dicName: '',
-        dicCode: '',
         parentId: 0,
-        sort: 0,
-        dicStatus: 0,
+        name: '',
+        resourceTypeCode: '',
+        resourceTypeName: '',
+        routerPath: '',
+        routerComponent: '',
+        routerIcon: '',
+        routerVisible: true,
+        routerKeepAlive: false,
+        routerPageName: '',
+        permission: '',
+        uri: '',
+        sort: 1,
+        status: 1,
         comments: ''
       },
       dialogFormVisible: false,
@@ -123,6 +200,7 @@ export default {
 
   created () {
     this.getList()
+    this.getOrgTypeList()
   },
 
   methods: {
@@ -130,6 +208,14 @@ export default {
       getPage(this.listQuery).then((response) => {
         this.list = response.data.list
         this.total = response.data.totalRows
+      })
+    },
+    getOrgTypeList () {
+      const params = {
+        dicCode: 'resource-type'
+      }
+      getChildrenByDicCode(params).then((response) => {
+        this.options = response.data
       })
     },
     async load (tree, treeNode, resolve) {
@@ -176,17 +262,22 @@ export default {
       }
     },
 
-    handleFilter () { },
+    handleFilter () {
+      this.listQuery.current = 1
+      this.listQuery.parentId = null
+      this.getList()
+    },
     handleDownload () { },
-    // handleCreate () { },
+    handleTopCreate () { },
 
-    createChildrenData () {
+    createData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           console.log(this.temp)
           create(this.temp).then(() => {
-            // this.list.unshift(this.temp)
-            this.dialogFormVisible = false
+            this.list.unshift(this.temp)
+            this.
+              this.dialogFormVisible = false
             this.$notify({
               title: '成功',
               message: '创建成功',
@@ -204,8 +295,8 @@ export default {
           const tempData = Object.assign({}, this.temp)
           console.log(tempData)
           update(tempData).then(() => {
-            // const index = this.list.findIndex(v => v.id === this.temp.id)
-            // this.list.splice(index, 1, this.temp)
+            const index = this.list.findIndex(v => v.id === this.temp.id)
+            this.list.splice(index, 1, this.temp)
             this.dialogFormVisible = false
             this.$notify({
               title: '成功',
@@ -216,6 +307,11 @@ export default {
           })
         }
       })
+    },
+
+    selectChangeParent (index) {
+      this.temp.resourceTypeCode = this.options[index].dicCode
+      this.temp.resourceTypeName = this.options[index].dicName
     }
   }
 };
